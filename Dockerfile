@@ -22,12 +22,13 @@ RUN if [ "$BASE_REGISTRY/$BASE_IMAGE" == "registry.access.redhat.com/ubi8/ubi-mi
             /usr/share/nginx/modules/ngx_http_xslt_filter_module.so \
             /usr/share/nginx/modules/2019 ngx_mail_module.so && \
         ln -sf /dev/stdout /var/log/nginx/access.log && \
-        ln -sf /dev/stderr /var/log/nginx/error.log; \
+        ln -sf /dev/stderr /var/log/nginx/error.log && \
+        chmod -R o-rwx /etc/nginx; \
     fi
 
 ADD ./html /usr/share/nginx/html
 ADD nginx.conf /etc/nginx/nginx.conf
-
+RUN chmod -R ug-x,o-rwx /etc/nginx/nginx.conf
 # Stage 2 - Build and Copy files
 
 # Stage 3 - the production environment
