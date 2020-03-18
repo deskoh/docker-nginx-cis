@@ -28,12 +28,16 @@ RUN if [ "$BASE_REGISTRY/$BASE_IMAGE" == "registry.access.redhat.com/ubi8/ubi-mi
 
 ADD ./html /usr/share/nginx/html
 ADD nginx.conf /etc/nginx/nginx.conf
-RUN chmod -R ug-x,o-rwx /etc/nginx/nginx.conf
+RUN chmod -R ug-x,o-rwx /etc/nginx/nginx.conf && \
+    chown -R nginx:nginx /etc/nginx/
+
 # Stage 2 - Build and Copy files
 
 # Stage 3 - the production environment
 FROM base as final
 
-EXPOSE 80
+EXPOSE 8080
+
+USER nginx
 
 CMD ["nginx", "-g", "daemon off;"]
