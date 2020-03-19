@@ -26,9 +26,10 @@ RUN if [ "$BASE_REGISTRY/$BASE_IMAGE" == "registry.access.redhat.com/ubi8/ubi-mi
         chmod -R o-rwx /etc/nginx; \
     fi
 
-ADD ./html /usr/share/nginx/html
-ADD nginx.conf /etc/nginx/nginx.conf
+COPY html /usr/share/nginx/html/
+COPY nginx.conf /etc/nginx/
 RUN chmod -R ug-x,o-rwx /etc/nginx/nginx.conf
+
 # Stage 2 - Build and Copy files
 
 # Stage 3 - the production environment
