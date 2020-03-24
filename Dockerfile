@@ -23,10 +23,13 @@ RUN if [ "$BASE_REGISTRY/$BASE_IMAGE" == "registry.access.redhat.com/ubi8/ubi-mi
             /usr/share/nginx/modules/2019 ngx_mail_module.so && \
         ln -sf /dev/stdout /var/log/nginx/access.log && \
         ln -sf /dev/stderr /var/log/nginx/error.log && \
-        chmod -R o-rwx /etc/nginx; \
+        chmod -R o-rwx /etc/nginx && \
+        rm -rf /usr/share/nginx/html/ && \
+        echo 'OK' > /usr/share/nginx/html/index.html && \
+        echo 'The page you are looking for is temporarily unavailable. Please try again later.' > /usr/share/nginx/html/50x.html && \
+        echo 'The page you are looking for is not found.' > /usr/share/nginx/html/40x.html; \
     fi
 
-COPY html /usr/share/nginx/html/
 COPY nginx.conf /etc/nginx/
 RUN chmod -R ug-x,o-rwx /etc/nginx/nginx.conf
 
