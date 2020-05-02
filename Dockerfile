@@ -27,17 +27,30 @@ RUN if [ "$BASE_REGISTRY/$BASE_IMAGE" == "registry.access.redhat.com/ubi8/ubi-mi
         rm -rf /usr/share/nginx/html/* && \
         echo 'OK' > /usr/share/nginx/html/index.html && \
         echo 'The page you are looking for is temporarily unavailable. Please try again later.' > /usr/share/nginx/html/50x.html && \
-        echo 'The page you are looking for is not found.' > /usr/share/nginx/html/40x.html; \
+        echo 'The page you are looking for is not found.' > /usr/share/nginx/html/40x.html && \
+        chown -R nginx:nginx /usr/share/nginx && \
+        chown -R nginx:nginx /var/log/nginx && \
+        chown -R nginx:nginx /etc/nginx; \
     fi
 
-COPY nginx.conf /etc/nginx/
+RUN touch /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/run/nginx.pid
+
+COPY --chown=nginx nginx.conf /etc/nginx/
 RUN chmod -R ug-x,o-rwx /etc/nginx/nginx.conf
 
 # Stage 2 - Build and Copy files
+FROM node:lts-alpine as builder
+WORKDIR /app
+RUN echo 'Hello from node' > /app/index.html
 
 # Stage 3 - the production environment
 FROM base as final
 
-EXPOSE 80
+WORKDIR /usr/share/nginx/html/
+
+COPY --chown=nginx --from=builder /app .
+
+USER nginx
 
 CMD ["nginx", "-g", "daemon off;"]
